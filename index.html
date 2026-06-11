@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>عالم العبايات - ERP</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #fff; overflow-x: hidden; }
+
+        .splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
+        .splash.hidden { opacity: 0; pointer-events: none; }
+        .logo-circle { width: 120px; height: 120px; border-radius: 50%; background: #D4AF37; display: flex; justify-content: center; align-items: center; border: 3px solid #fff; margin-bottom: 30px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .logo-text { font-size: 48px; font-weight: bold; color: #1a1a2e; }
+        .splash-title { font-size: 28px; font-weight: bold; color: #D4AF37; margin-bottom: 10px; }
+        .splash-subtitle { font-size: 16px; color: #aaa; margin-bottom: 30px; }
+        .copyright-box { background: #2d2d44; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; width: 80%; max-width: 300px; }
+        .copyright-text { font-size: 14px; color: #D4AF37; font-weight: bold; margin-bottom: 5px; }
+        .developer-info { font-size: 12px; color: #aaa; margin-bottom: 3px; }
+        .phone-number { font-size: 12px; color: #D4AF37; }
+        .loader { width: 40px; height: 40px; border: 4px solid #2d2d44; border-top: 4px solid #D4AF37; border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .version { position: absolute; bottom: 40px; font-size: 14px; color: #666; }
+
+        .login-screen { min-height: 100vh; background: #1a1a2e; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .login-logo { text-align: center; margin-bottom: 40px; }
+        .login-logo-circle { width: 100px; height: 100px; border-radius: 50%; background: #D4AF37; display: flex; justify-content: center; align-items: center; border: 3px solid #fff; margin: 0 auto 15px; }
+        .login-logo-text { font-size: 40px; font-weight: bold; color: #1a1a2e; }
+        .login-form { background: #fff; border-radius: 15px; padding: 25px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .login-title { font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: center; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 14px; color: #666; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; color: #333; background: #f5f5f5; }
+        .input-group input:focus { outline: none; border-color: #D4AF37; background: #fff; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: all 0.3s; }
+        .btn-primary { background: #D4AF37; color: #1a1a2e; }
+        .btn-secondary { background: #2d2d44; color: #D4AF37; }
+        .hint { text-align: center; color: #999; font-size: 12px; margin-top: 10px; }
+
+        .main-screen { display: none; min-height: 100vh; background: #f5f5f5; }
+        .main-screen.active { display: block; }
+        .navbar { background: #1a1a2e; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #D4AF37; position: sticky; top: 0; z-index: 100; }
+        .navbar-title { font-size: 20px; font-weight: bold; color: #D4AF37; }
+        .navbar-menu { display: flex; gap: 15px; }
+        .navbar-menu button { background: none; border: none; color: #aaa; font-size: 14px; cursor: pointer; padding: 5px 10px; border-radius: 5px; }
+        .navbar-menu button.active { color: #D4AF37; background: #2d2d44; }
+        .content { padding: 20px; padding-bottom: 80px; }
+        .section-title { font-size: 24px; font-weight: bold; color: #1a1a2e; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 30px; background: #D4AF37; border-radius: 2px; }
+        .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-right: 4px solid #D4AF37; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 18px; font-weight: bold; color: #1a1a2e; }
+        .card-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #fff; }
+        .badge-success { background: #4CAF50; }
+        .badge-warning { background: #FF9800; }
+        .badge-danger { background: #f44336; }
+        .card-body { color: #666; line-height: 1.6; }
+        .card-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
+        .btn-small { padding: 8px 15px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #1a1a2e; border-radius: 12px; padding: 20px; text-align: center; color: #fff; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #D4AF37; margin-bottom: 5px; }
+        .stat-label { font-size: 12px; color: #aaa; }
+        .search-box { display: flex; align-items: center; background: #fff; border-radius: 10px; padding: 12px 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .search-box input { flex: 1; border: none; background: none; font-size: 16px; color: #333; margin-right: 10px; }
+        .search-box input:focus { outline: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a2e; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #D4AF37; z-index: 100; }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #aaa; font-size: 12px; cursor: pointer; padding: 5px 15px; border-radius: 10px; }
+        .bottom-nav-item.active { color: #D4AF37; background: #2d2d44; }
+        .bottom-nav-icon { font-size: 24px; }
+        .fab { position: fixed; bottom: 80px; left: 20px; width: 60px; height: 60px; border-radius: 50%; background: #D4AF37; color: #1a1a2e; border: none; font-size: 30px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .data-table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: #1a1a2e; color: #D4AF37; padding: 15px; text-align: right; font-weight: bold; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #eee; color: #333; }
+        .tabs { display: flex; background: #fff; border-radius: 10px; padding: 5px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; color: #666; }
+        .tab.active { background: #D4AF37; color: #1a1a2e; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: #fff; border-radius: 15px; padding: 25px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 20px; font-weight: bold; color: #1a1a2e; }
+        .modal-close { background: none; border: none; font-size: 24px; color: #999; cursor: pointer; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; color: #333; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #D4AF37; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert.show { display: block; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 26, 46, 0.9); justify-content: center; align-items: center; z-index: 1000; }
+        .loading-overlay.show { display: flex; }
+        .loading-spinner { width: 50px; height: 50px; border: 4px solid #2d2d44; border-top: 4px solid #D4AF37; border-radius: 50%; animation: spin 1s linear infinite; }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } .navbar-menu { display: none; } }
+        @media print { .navbar, .bottom-nav, .fab, .btn { display: none !important; } .content { padding: 0; } .card { box-shadow: none; border: 1px solid #ddd; } }
+    </style>
+</head>
+<body>
+    <div class="splash" id="splashScreen">
+        <div class="logo-circle"><span class="logo-text">A</span></div>
+        <div class="splash-title">عالم العبايات</div>
+        <div class="splash-subtitle">نظام إدارة المخزون والفواتير</div>
+        <div class="copyright-box">
+            <div class="copyright-text">© 2026 عالم العبايات</div>
+            <div class="developer-info">المطور: علام العروشي</div>
+            <div class="phone-number">780766520</div>
+            <div class="developer-info">olamalarwshi@gmail.com</div>
+        </div>
+        <div class="loader"></div>
+        <div class="version">الإصدار 1.0.0</div>
+    </div>
+
+    <div class="login-screen" id="loginScreen">
+        <div class="login-logo">
+            <div class="login-logo-circle"><span class="login-logo-text">A</span></div>
+            <div class="splash-title">عالم العبايات</div>
+            <div class="splash-subtitle">نظام إدارة المخزون والفواتير</div>
+        </div>
+        <div class="login-form">
+            <div class="login-title">تسجيل الدخول</div>
+            <div class="alert alert-error" id="loginError"></div>
+            <div class="input-group">
+                <label>اسم المستخدم</label>
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" value="admin">
+            </div>
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" value="admin123">
+            </div>
+            <button class="btn btn-primary" onclick="login()">دخول</button>
+            <button class="btn btn-secondary" onclick="biometricLogin()">🔐 تسجيل الدخول بالبصمة</button>
+            <div class="hint">المستخدم الافتراضي: admin / admin123</div>
+        </div>
+        <div class="copyright-box" style="margin-top: 30px; width: 90%; max-width: 400px;">
+            <div class="copyright-text">© 2026 عالم العبايات</div>
+            <div class="developer-info">المطور: علام العروشي</div>
+            <div class="phone-number">780766520</div>
+            <div class="developer-info">olamalarwshi@gmail.com</div>
+        </div>
+    </div>
+
+    <div class="main-screen" id="mainScreen">
+        <nav class="navbar">
+            <div class="navbar-title" id="pageTitle">المخزون</div>
+            <div class="navbar-menu">
+                <button class="active" onclick="showPage('inventory')">المخزون</button>
+                <button onclick="showPage('invoices')">الفواتير</button>
+                <button onclick="showPage('reports')">التقارير</button>
+                <button onclick="showPage('settings')">الإعدادات</button>
+                <button onclick="logout()">خروج</button>
+            </div>
+        </nav>
+        <div class="content" id="mainContent"></div>
+        <button class="fab" id="fabButton" onclick="showAddModal()">+</button>
+        <nav class="bottom-nav">
+            <div class="bottom-nav-item active" onclick="showPage('inventory')"><span class="bottom-nav-icon">📦</span><span>المخزون</span></div>
+            <div class="bottom-nav-item" onclick="showPage('invoices')"><span class="bottom-nav-icon">🧾</span><span>الفواتير</span></div>
+            <div class="bottom-nav-item" onclick="showPage('reports')"><span class="bottom-nav-icon">📊</span><span>التقارير</span></div>
+            <div class="bottom-nav-item" onclick="showPage('settings')"><span class="bottom-nav-icon">⚙️</span><span>الإعدادات</span></div>
+        </nav>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">عنوان</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+<script>
+// عالم العبايات - ERP
+// المطور: علام العروشي
+// الهاتف: 780766520
+// البريد: olamalarwshi@gmail.com
+// © 2026 جميع الحقوق محفوظة
+
+const defaultData = {
+    users: [
+        { id: 1, username: 'admin', password: 'admin123', email: 'admin@abaya.com', role: 'admin', full_name: 'المسؤول', phone: '0500000000' },
+        { id: 2, username: 'manager', password: 'manager123', email: 'manager@abaya.com', role: 'manager', full_name: 'المدير', phone: '0500000001' },
+        { id: 3, username: 'user', password: 'user123', email: 'user@abaya.com', role: 'user', full_name: 'المستخدم', phone: '0500000002' }
+    ],
+    categories: [
+        { id: 1, name: 'عبايات يومية', description: 'عبايات للاستخدام اليومي', color: '#D4AF37', icon: 'sunny-outline' },
+        { id: 2, name: 'عبايات سهرة', description: 'عبايات للمناسبات والسهرات', color: '#9C27B0', icon: 'moon-outline' },
+        { id: 3, name: 'عبايات زفاف', description: 'عبايات للأعراس والمناسبات الخاصة', color: '#E91E63', icon: 'heart-outline' },
+        { id: 4, name: 'عبايات رياضية', description: 'عبايات رياضية ومريحة', color: '#4CAF50', icon: 'fitness-outline' },
+        { id: 5, name: 'عبايات أطفال', description: 'عبايات للأطفال', color: '#FF9800', icon: 'happy-outline' },
+        { id: 6, name: 'إكسسوارات', description: 'إكسسوارات ومجوهرات', color: '#2196F3', icon: 'diamond-outline' },
+        { id: 7, name: 'أحذية', description: 'أحذية وصنادل', color: '#795548', icon: 'footsteps-outline' },
+        { id: 8, name: 'حقائب', description: 'حقائب وشنط', color: '#607D8B', icon: 'bag-outline' }
+    ],
+    products: [
+        { id: 1, name: 'عباية سوداء كلاسيك', code: 'ABY-001', category_id: 1, description: 'عباية سوداء كلاسيكية للاستخدام اليومي', purchase_price: 150, sale_price: 250, quantity: 50, min_stock: 10, barcode: '6281234567890', notes: 'مقاسات متوفرة: S, M, L, XL, XXL' },
+        { id: 2, name: 'عباية سوداء مطرزة', code: 'ABY-002', category_id: 1, description: 'عباية سوداء مطرزة باليد', purchase_price: 200, sale_price: 350, quantity: 30, min_stock: 5, barcode: '6281234567891', notes: 'مقاسات متوفرة: M, L, XL' },
+        { id: 3, name: 'عباية سهرة حرير', code: 'ABY-003', category_id: 2, description: 'عباية سهرة من الحرير الفاخر', purchase_price: 400, sale_price: 750, quantity: 15, min_stock: 3, barcode: '6281234567892', notes: 'متوفرة باللونين: أسود وذهبي' },
+        { id: 4, name: 'عباية زفاف بيضاء', code: 'ABY-004', category_id: 3, description: 'عباية زفاف بيضاء مطرزة بالكريستال', purchase_price: 800, sale_price: 1500, quantity: 8, min_stock: 2, barcode: '6281234567893', notes: 'مقاسات خاصة متوفرة' },
+        { id: 5, name: 'عباية رياضية قطن', code: 'ABY-005', category_id: 4, description: 'عباية رياضية من القطن المريح', purchase_price: 100, sale_price: 180, quantity: 100, min_stock: 20, barcode: '6281234567894', notes: 'مقاسات متوفرة: S, M, L, XL' },
+        { id: 6, name: 'عباية أطفال وردي', code: 'ABY-006', category_id: 5, description: 'عباية أطفال باللون الوردي', purchase_price: 80, sale_price: 150, quantity: 40, min_stock: 10, barcode: '6281234567895', notes: 'أعمار: 4-12 سنة' },
+        { id: 7, name: 'طقم إكسسوارات ذهبي', code: 'ACC-001', category_id: 6, description: 'طقم إكسسوارات ذهبي فاخر', purchase_price: 120, sale_price: 250, quantity: 25, min_stock: 5, barcode: '6281234567896', notes: 'يتضمن: عقد، أقراط، سوار' },
+        { id: 8, name: 'صندل جلد فاخر', code: 'SHO-001', category_id: 7, description: 'صندل جلد طبيعي فاخر', purchase_price: 180, sale_price: 350, quantity: 20, min_stock: 5, barcode: '6281234567897', notes: 'مقاسات: 36-42' },
+        { id: 9, name: 'حقيبة يد جلد', code: 'BAG-001', category_id: 8, description: 'حقيبة يد من الجلد الطبيعي', purchase_price: 250, sale_price: 450, quantity: 18, min_stock: 5, barcode: '6281234567898', notes: 'ألوان: أسود، بني، بيج' }
+    ],
+    customers: [
+        { id: 1, name: 'عميل نقدي', phone: '0500000000', email: 'cash@customer.com', address: 'الرياض', city: 'الرياض' },
+        { id: 2, name: 'فاطمة أحمد', phone: '0501234567', email: 'fatima@email.com', address: 'حي النسيم', city: 'الرياض' },
+        { id: 3, name: 'نورة سعد', phone: '0507654321', email: 'noura@email.com', address: 'حي العليا', city: 'جدة' },
+        { id: 4, name: 'سارة محمد', phone: '0509876543', email: 'sara@email.com', address: 'حي الروضة', city: 'الدمام' }
+    ],
+    store_settings: {
+        store_name: 'عالم العبايات', store_name_en: 'Abaya World', store_address: 'الرياض، المملكة العربية السعودية',
+        store_phone: '0500000000', store_email: 'olamalarwshi@gmail.com', store_website: 'www.abayaworld.com',
+        tax_number: '300123456700003', commercial_registration: '1010123456', invoice_prefix: 'INV-',
+        invoice_footer: 'شكراً لتعاملكم معنا', invoice_terms: 'السعر شامل الضريبة المضافة',
+        currency: 'SAR', currency_symbol: 'ر.س', decimal_places: 2, tax_percentage: 15,
+        enable_tax: true, enable_discount: true, enable_stock_alert: true, low_stock_threshold: 5,
+        language: 'ar', theme: 'dark'
+    },
+    invoices: [], invoice_items: [], payments: [], stock_movements: [],
+    notifications: [
+        { id: 1, title: 'مرحباً بك!', message: 'تم تثبيت التطبيق بنجاح. ابدأ بإدارة متجرك الآن.', type: 'success', is_read: false, created_at: new Date().toISOString() },
+        { id: 2, title: 'تنبيه مخزون', message: 'منتج "عباية زفاف بيضاء" وصل للحد الأدنى (8 قطع)', type: 'warning', is_read: false, created_at: new Date().toISOString() },
+        { id: 3, title: 'تنبيه مخزون', message: 'منتج "عباية سهرة حرير" وصل للحد الأدنى (15 قطعة)', type: 'warning', is_read: false, created_at: new Date().toISOString() }
+    ]
+};
+
+const Storage = {
+    get: (key) => { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; },
+    set: (key, value) => { localStorage.setItem(key, JSON.stringify(value)); },
+    remove: (key) => { localStorage.removeItem(key); },
+    clear: () => { localStorage.clear(); }
+};
+
+function initData() {
+    if (!Storage.get('initialized')) {
+        Object.keys(defaultData).forEach(key => { Storage.set(key, defaultData[key]); });
+        Storage.set('initialized', true); Storage.set('currentUser', null);
+    }
+}
+
+let currentUser = null, currentPage = 'inventory', editingId = null;
+
+function generateId() { return Date.now() + Math.random().toString(36).substr(2, 9); }
+function generateInvoiceNumber() {
+    const prefix = Storage.get('store_settings')?.invoice_prefix || 'INV-';
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${prefix}${date}-${random}`;
+}
+function formatCurrency(amount) {
+    const settings = Storage.get('store_settings') || {};
+    const symbol = settings.currency_symbol || 'ر.س';
+    return `${parseFloat(amount).toFixed(settings.decimal_places || 2)} ${symbol}`;
+}
+function formatDate(date) { return new Date(date).toLocaleDateString('ar-SA'); }
+function showAlert(message, type = 'success') {
+    const alert = document.createElement('div'); alert.className = `alert alert-${type} show`; alert.textContent = message;
+    document.body.appendChild(alert); setTimeout(() => alert.remove(), 3000);
+}
+function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    if (!username || !password) { showAlert('الرجاء إدخال اسم المستخدم وكلمة المرور', 'error'); return; }
+    const users = Storage.get('users') || [];
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) { currentUser = user; Storage.set('currentUser', user); showMainScreen(); showAlert('تم تسجيل الدخول بنجاح'); }
+    else { showAlert('اسم المستخدم أو كلمة المرور غير صحيحة', 'error'); }
+}
+function biometricLogin() { showAlert('جاري التحقق من البصمة...', 'warning'); setTimeout(() => { login(); }, 1500); }
+function logout() { currentUser = null; Storage.set('currentUser', null); showLoginScreen(); showAlert('تم تسجيل الخروج'); }
+
+function showLoginScreen() { document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('mainScreen').classList.remove('active'); }
+function showMainScreen() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainScreen').classList.add('active'); showPage('inventory'); }
+
+function showPage(page) {
+    currentPage = page;
+    document.querySelectorAll('.navbar-menu button').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.navbar-menu button[onclick="showPage('${page}')"]`)?.classList.add('active');
+    document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`.bottom-nav-item[onclick="showPage('${page}')"]`)?.classList.add('active');
+    const titles = { inventory: 'المخزون', invoices: 'الفواتير', reports: 'التقارير', settings: 'الإعدادات' };
+    document.getElementById('pageTitle').textContent = titles[page] || page;
+    const content = document.getElementById('mainContent'); content.innerHTML = '';
+    switch(page) {
+        case 'inventory': loadInventory(content); break;
+        case 'invoices': loadInvoices(content); break;
+        case 'reports': loadReports(content); break;
+        case 'settings': loadSettings(content); break;
+    }
+}
+
+function loadInventory(container) {
+    const products = Storage.get('products') || [];
+    const categories = Storage.get('categories') || [];
+    const stats = { total: products.length, lowStock: products.filter(p => p.quantity <= p.min_stock).length, outOfStock: products.filter(p => p.quantity === 0).length, totalValue: products.reduce((sum, p) => sum + (p.quantity * p.sale_price), 0) };
+    container.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">${stats.total}</div><div class="stat-label">إجمالي المنتجات</div></div>
+            <div class="stat-card"><div class="stat-value" style="color: #FF9800">${stats.lowStock}</div><div class="stat-label">منخفض المخزون</div></div>
+            <div class="stat-card"><div class="stat-value" style="color: #f44336">${stats.outOfStock}</div><div class="stat-label">نفذ من المخزون</div></div>
+            <div class="stat-card"><div class="stat-value">${formatCurrency(stats.totalValue)}</div><div class="stat-label">قيمة المخزون</div></div>
+        </div>
+        <div class="search-box"><span style="font-size: 20px; margin-left: 10px;">🔍</span><input type="text" id="searchProducts" placeholder="البحث في المنتجات..." onkeyup="searchProducts()"></div>
+        <div id="productsList">${products.map(product => {
+            const category = categories.find(c => c.id === product.category_id);
+            const status = product.quantity === 0 ? 'danger' : product.quantity <= product.min_stock ? 'warning' : 'success';
+            const statusText = product.quantity === 0 ? 'نفذ' : product.quantity <= product.min_stock ? 'منخفض' : 'متوفر';
+            return `<div class="card" data-id="${product.id}"><div class="card-header"><div><div class="card-title">${product.name}</div><div style="color: #999; font-size: 12px; margin-top: 5px;">${product.code} | ${category?.name || 'غير مصنف'}</div></div><div class="card-badge badge-${status}">${statusText}</div></div><div class="card-body"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>الكمية: ${product.quantity} قطعة</span><span>الحد الأدنى: ${product.min_stock}</span></div><div style="display: flex; justify-content: space-between;"><span>سعر الشراء: ${formatCurrency(product.purchase_price)}</span><span style="font-weight: bold; color: #D4AF37;">سعر البيع: ${formatCurrency(product.sale_price)}</span></div></div><div class="card-footer"><button class="btn-small btn-primary" onclick="editProduct(${product.id})">تعديل</button><button class="btn-small btn-danger" onclick="deleteProduct(${product.id})">حذف</button></div></div>`;
+        }).join('')}</div>`;
+}
+function searchProducts() { const search = document.getElementById('searchProducts').value.toLowerCase(); document.querySelectorAll('.card').forEach(card => { card.style.display = card.textContent.toLowerCase().includes(search) ? 'block' : 'none'; }); }
+function editProduct(id) { editingId = id; const products = Storage.get('products') || []; const product = products.find(p => p.id === id); if (!product) return; const categories = Storage.get('categories') || []; document.getElementById('modalTitle').textContent = 'تعديل منتج'; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>اسم المنتج</label><input type="text" id="editName" value="${product.name}"></div><div class="form-group"><label>كود المنتج</label><input type="text" id="editCode" value="${product.code || ''}"></div><div class="form-group"><label>الفئة</label><select id="editCategory">${categories.map(c => `<option value="${c.id}" ${c.id === product.category_id ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div><div class="form-row"><div class="form-group"><label>سعر الشراء</label><input type="number" id="editPurchasePrice" value="${product.purchase_price}"></div><div class="form-group"><label>سعر البيع</label><input type="number" id="editSalePrice" value="${product.sale_price}"></div></div><div class="form-row"><div class="form-group"><label>الكمية</label><input type="number" id="editQuantity" value="${product.quantity}"></div><div class="form-group"><label>الحد الأدنى</label><input type="number" id="editMinStock" value="${product.min_stock}"></div></div><div class="form-group"><label>الباركود</label><input type="text" id="editBarcode" value="${product.barcode || ''}"></div><div class="form-group"><label>ملاحظات</label><textarea id="editNotes">${product.notes || ''}</textarea></div><button class="btn btn-primary" onclick="saveProduct()">حفظ</button>`; document.getElementById('modal').classList.add('show'); }
+function saveProduct() { const products = Storage.get('products') || []; const index = products.findIndex(p => p.id === editingId); if (index === -1) return; products[index] = { ...products[index], name: document.getElementById('editName').value, code: document.getElementById('editCode').value, category_id: parseInt(document.getElementById('editCategory').value), purchase_price: parseFloat(document.getElementById('editPurchasePrice').value) || 0, sale_price: parseFloat(document.getElementById('editSalePrice').value) || 0, quantity: parseInt(document.getElementById('editQuantity').value) || 0, min_stock: parseInt(document.getElementById('editMinStock').value) || 5, barcode: document.getElementById('editBarcode').value, notes: document.getElementById('editNotes').value }; Storage.set('products', products); closeModal(); showPage('inventory'); showAlert('تم حفظ المنتج بنجاح'); }
+function deleteProduct(id) { if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return; const products = Storage.get('products') || []; const filtered = products.filter(p => p.id !== id); Storage.set('products', filtered); showPage('inventory'); showAlert('تم حذف المنتج'); }
+function showAddModal() { if (currentPage === 'inventory') { editingId = null; const categories = Storage.get('categories') || []; document.getElementById('modalTitle').textContent = 'إضافة منتج جديد'; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>اسم المنتج *</label><input type="text" id="newName" placeholder="أدخل اسم المنتج"></div><div class="form-group"><label>كود المنتج</label><input type="text" id="newCode" placeholder="كود المنتج (اختياري)"></div><div class="form-group"><label>الفئة</label><select id="newCategory">${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select></div><div class="form-row"><div class="form-group"><label>سعر الشراء</label><input type="number" id="newPurchasePrice" placeholder="0.00"></div><div class="form-group"><label>سعر البيع *</label><input type="number" id="newSalePrice" placeholder="0.00"></div></div><div class="form-row"><div class="form-group"><label>الكمية</label><input type="number" id="newQuantity" placeholder="0"></div><div class="form-group"><label>الحد الأدنى</label><input type="number" id="newMinStock" value="5"></div></div><div class="form-group"><label>الباركود</label><input type="text" id="newBarcode" placeholder="باركود المنتج"></div><div class="form-group"><label>ملاحظات</label><textarea id="newNotes" placeholder="ملاحظات إضافية..."></textarea></div><button class="btn btn-primary" onclick="addProduct()">إضافة</button>`; document.getElementById('modal').classList.add('show'); } }
+function addProduct() { const name = document.getElementById('newName').value; const salePrice = parseFloat(document.getElementById('newSalePrice').value); if (!name) { showAlert('اسم المنتج مطلوب', 'error'); return; } if (!salePrice || salePrice <= 0) { showAlert('سعر البيع مطلوب', 'error'); return; } const products = Storage.get('products') || []; products.push({ id: Date.now(), name: name, code: document.getElementById('newCode').value, category_id: parseInt(document.getElementById('newCategory').value), purchase_price: parseFloat(document.getElementById('newPurchasePrice').value) || 0, sale_price: salePrice, quantity: parseInt(document.getElementById('newQuantity').value) || 0, min_stock: parseInt(document.getElementById('newMinStock').value) || 5, barcode: document.getElementById('newBarcode').value, notes: document.getElementById('newNotes').value }); Storage.set('products', products); closeModal(); showPage('inventory'); showAlert('تم إضافة المنتج بنجاح'); }
+
+function loadInvoices(container) {
+    const invoices = Storage.get('invoices') || [];
+    const stats = { total: invoices.length, paid: invoices.filter(i => i.payment_status === 'paid').length, pending: invoices.filter(i => i.payment_status === 'pending').length, totalAmount: invoices.reduce((sum, i) => sum + (i.final_amount || 0), 0) };
+    container.innerHTML = `<div class="stats-grid"><div class="stat-card"><div class="stat-value">${stats.total}</div><div class="stat-label">إجمالي الفواتير</div></div><div class="stat-card"><div class="stat-value" style="color: #4CAF50">${stats.paid}</div><div class="stat-label">المدفوعة</div></div><div class="stat-card"><div class="stat-value" style="color: #FF9800">${stats.pending}</div><div class="stat-label">المعلقة</div></div><div class="stat-card"><div class="stat-value">${formatCurrency(stats.totalAmount)}</div><div class="stat-label">إجمالي المبيعات</div></div></div><div class="search-box"><span style="font-size: 20px; margin-left: 10px;">🔍</span><input type="text" placeholder="البحث في الفواتير..." onkeyup="searchInvoices(this.value)"></div><div id="invoicesList">${invoices.length === 0 ? '<div style="text-align: center; padding: 40px; color: #999;">لا توجد فواتير بعد</div>' : invoices.map(invoice => `<div class="card" data-id="${invoice.id}"><div class="card-header"><div><div class="card-title">فاتورة #${invoice.invoice_number}</div><div style="color: #999; font-size: 12px; margin-top: 5px;">${formatDate(invoice.created_at)} | ${invoice.customer_name}</div></div><div class="card-badge badge-${invoice.payment_status === 'paid' ? 'success' : 'warning'}">${invoice.payment_status === 'paid' ? 'مدفوعة' : 'معلقة'}</div></div><div class="card-body"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>الإجمالي: ${formatCurrency(invoice.total_amount)}</span><span>الخصم: ${formatCurrency(invoice.discount_amount)}</span></div><div style="display: flex; justify-content: space-between; font-weight: bold;"><span>المبلغ النهائي:</span><span style="color: #D4AF37;">${formatCurrency(invoice.final_amount)}</span></div></div><div class="card-footer"><button class="btn-small btn-primary" onclick="viewInvoice(${invoice.id})">عرض</button><button class="btn-small btn-danger" onclick="deleteInvoice(${invoice.id})">حذف</button></div></div>`).join('')}</div></div>`;
+}
+function searchInvoices(search) { document.querySelectorAll('#invoicesList .card').forEach(card => { card.style.display = card.textContent.toLowerCase().includes(search.toLowerCase()) ? 'block' : 'none'; }); }
+function viewInvoice(id) { const invoices = Storage.get('invoices') || []; const invoice = invoices.find(i => i.id === id); if (!invoice) return; document.getElementById('modalTitle').textContent = `فاتورة #${invoice.invoice_number}`; document.getElementById('modalBody').innerHTML = `<div style="margin-bottom: 20px;"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>العميل:</span><span style="font-weight: bold;">${invoice.customer_name}</span></div><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>التاريخ:</span><span>${formatDate(invoice.created_at)}</span></div><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>طريقة الدفع:</span><span>${invoice.payment_method === 'cash' ? 'نقدي' : invoice.payment_method === 'card' ? 'بطاقة' : 'تحويل'}</span></div></div><div style="border-top: 2px solid #eee; padding-top: 15px;"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>الإجمالي:</span><span>${formatCurrency(invoice.total_amount)}</span></div><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>الخصم:</span><span style="color: #f44336;">-${formatCurrency(invoice.discount_amount)}</span></div><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>الضريبة:</span><span>${formatCurrency(invoice.tax_amount)}</span></div><div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; color: #D4AF37; border-top: 2px solid #D4AF37; padding-top: 10px;"><span>المبلغ النهائي:</span><span>${formatCurrency(invoice.final_amount)}</span></div></div><button class="btn btn-primary" style="margin-top: 20px;" onclick="printInvoice()">🖨️ طباعة</button>`; document.getElementById('modal').classList.add('show'); }
+function deleteInvoice(id) { if (!confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) return; const invoices = Storage.get('invoices') || []; const filtered = invoices.filter(i => i.id !== id); Storage.set('invoices', filtered); showPage('invoices'); showAlert('تم حذف الفاتورة'); }
+function printInvoice() { window.print(); }
+
+function loadReports(container) {
+    const products = Storage.get('products') || []; const invoices = Storage.get('invoices') || [];
+    const totalSales = invoices.reduce((sum, i) => sum + (i.final_amount || 0), 0);
+    const totalProducts = products.length; const lowStock = products.filter(p => p.quantity <= p.min_stock).length;
+    const totalValue = products.reduce((sum, p) => sum + (p.quantity * p.sale_price), 0);
+    container.innerHTML = `<div class="stats-grid"><div class="stat-card"><div class="stat-value">${formatCurrency(totalSales)}</div><div class="stat-label">إجمالي المبيعات</div></div><div class="stat-card"><div class="stat-value">${totalProducts}</div><div class="stat-label">المنتجات</div></div><div class="stat-card"><div class="stat-value" style="color: #FF9800">${lowStock}</div><div class="stat-label">منخفض المخزون</div></div><div class="stat-card"><div class="stat-value">${formatCurrency(totalValue)}</div><div class="stat-label">قيمة المخزون</div></div></div><div class="tabs"><div class="tab active" onclick="showReportTab('sales')">المبيعات</div><div class="tab" onclick="showReportTab('inventory')">المخزون</div><div class="tab" onclick="showReportTab('products')">المنتجات</div></div><div id="reportSales" class="tab-content active"><div class="data-table"><table><thead><tr><th>التاريخ</th><th>رقم الفاتورة</th><th>العميل</th><th>المبلغ</th></tr></thead><tbody>${invoices.length === 0 ? '<tr><td colspan="4" style="text-align: center;">لا توجد مبيعات</td></tr>' : invoices.map(i => `<tr><td>${formatDate(i.created_at)}</td><td>${i.invoice_number}</td><td>${i.customer_name}</td><td style="font-weight: bold; color: #D4AF37;">${formatCurrency(i.final_amount)}</td></tr>`).join('')}</tbody></table></div></div><div id="reportInventory" class="tab-content"><div class="data-table"><table><thead><tr><th>المنتج</th><th>الكمية</th><th>الحد الأدنى</th><th>الحالة</th><th>القيمة</th></tr></thead><tbody>${products.map(p => { const status = p.quantity === 0 ? 'نفذ' : p.quantity <= p.min_stock ? 'منخفض' : 'متوفر'; const statusColor = p.quantity === 0 ? '#f44336' : p.quantity <= p.min_stock ? '#FF9800' : '#4CAF50'; return `<tr><td>${p.name}</td><td>${p.quantity}</td><td>${p.min_stock}</td><td style="color: ${statusColor}; font-weight: bold;">${status}</td><td>${formatCurrency(p.quantity * p.sale_price)}</td></tr>`; }).join('')}</tbody></table></div></div><div id="reportProducts" class="tab-content"><div class="data-table"><table><thead><tr><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الربح</th><th>نسبة الربح</th></tr></thead><tbody>${products.map(p => { const profit = p.sale_price - p.purchase_price; const profitPercent = p.purchase_price > 0 ? ((profit / p.purchase_price) * 100).toFixed(1) : 0; return `<tr><td>${p.name}</td><td>${formatCurrency(p.purchase_price)}</td><td>${formatCurrency(p.sale_price)}</td><td style="color: ${profit > 0 ? '#4CAF50' : '#f44336'}; font-weight: bold;">${formatCurrency(profit)}</td><td>${profitPercent}%</td></tr>`; }).join('')}</tbody></table></div></div>`;
+}
+function showReportTab(tab) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.getElementById(`report${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active'); }
+
+function loadSettings(container) {
+    const settings = Storage.get('store_settings') || {};
+    container.innerHTML = `<div class="section-title">⚙️ إعدادات المتجر</div><div class="card"><div class="card-title">معلومات المتجر</div><div class="form-group"><label>اسم المتجر</label><input type="text" id="settingStoreName" value="${settings.store_name || ''}"></div><div class="form-group"><label>العنوان</label><input type="text" id="settingAddress" value="${settings.store_address || ''}"></div><div class="form-group"><label>رقم الهاتف</label><input type="text" id="settingPhone" value="${settings.store_phone || ''}"></div><div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="settingEmail" value="${settings.store_email || ''}"></div></div><div class="card"><div class="card-title">إعدادات الفواتير</div><div class="form-group"><label>بادئة رقم الفاتورة</label><input type="text" id="settingPrefix" value="${settings.invoice_prefix || 'INV-'}"></div><div class="form-group"><label>نسبة الضريبة (%)</label><input type="number" id="settingTax" value="${settings.tax_percentage || 15}"></div><div class="form-group"><label>العملة</label><input type="text" id="settingCurrency" value="${settings.currency_symbol || 'ر.س'}"></div></div><div class="card"><div class="card-title">إعدادات المخزون</div><div class="form-group"><label>الحد الأدنى للتنبيه</label><input type="number" id="settingMinStock" value="${settings.low_stock_threshold || 5}"></div></div><button class="btn btn-primary" onclick="saveSettings()">💾 حفظ الإعدادات</button><button class="btn btn-secondary" onclick="exportData()">📤 تصدير البيانات</button><button class="btn btn-danger" onclick="resetData()">⚠️ إعادة تعيين البيانات</button><div class="copyright-box" style="margin-top: 30px; width: 100%;"><div class="copyright-text">© 2026 عالم العبايات</div><div class="developer-info">المطور: علام العروشي</div><div class="phone-number">780766520</div><div class="developer-info">olamalarwshi@gmail.com</div></div>`;
+}
+function saveSettings() { const settings = { store_name: document.getElementById('settingStoreName').value, store_address: document.getElementById('settingAddress').value, store_phone: document.getElementById('settingPhone').value, store_email: document.getElementById('settingEmail').value, invoice_prefix: document.getElementById('settingPrefix').value, tax_percentage: parseFloat(document.getElementById('settingTax').value) || 15, currency_symbol: document.getElementById('settingCurrency').value, low_stock_threshold: parseInt(document.getElementById('settingMinStock').value) || 5 }; Storage.set('store_settings', { ...Storage.get('store_settings'), ...settings }); showAlert('تم حفظ الإعدادات بنجاح'); }
+function exportData() { const data = { users: Storage.get('users'), products: Storage.get('products'), customers: Storage.get('customers'), invoices: Storage.get('invoices'), store_settings: Storage.get('store_settings'), export_date: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `abaya_erp_backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url); showAlert('تم تصدير البيانات'); }
+function resetData() { if (!confirm('هل أنت متأكد من إعادة تعيين جميع البيانات؟\nسيتم حذف جميع البيانات وإعادة تعيينها للقيم الافتراضية.')) return; Storage.clear(); initData(); showAlert('تم إعادة تعيين البيانات'); showPage('inventory'); }
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); editingId = null; }
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => { document.getElementById('splashScreen').classList.add('hidden'); }, 2000);
+    initData();
+    const savedUser = Storage.get('currentUser');
+    if (savedUser) { currentUser = savedUser; showMainScreen(); } else { showLoginScreen(); }
+});
+
+document.addEventListener('click', function(e) { if (e.target === document.getElementById('modal')) { closeModal(); } });
+</script>
+</body>
+</html>
